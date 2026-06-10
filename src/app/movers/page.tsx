@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import YahooFinance from "yahoo-finance2";
 import fetchNews from "@/lib/fetchNews";

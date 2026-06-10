@@ -4,7 +4,8 @@ import fetchNews from "@/lib/fetchNews";
 import analyzeMove from "@/lib/analyzeMove";
 import { type StockData } from "@/lib/types";
 
-export const revalidate = 600;
+export const dynamic = "force-dynamic";
+// export const revalidate = 600;
 
 const yf = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 

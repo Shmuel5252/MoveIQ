@@ -10,6 +10,7 @@ import PriceChart from "@/components/PriceChart";
 import NewsSection from "@/components/NewsSection";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import MarketPulse from "@/components/MarketPulse";
+import { calculateHeatScore } from "@/lib/calculateHeatScore";
 import Timeline from "@/components/Timeline";
 import BullBearCard from "@/components/BullBearCard";
 import RelatedStocks from "@/components/RelatedStocks";
@@ -132,12 +133,19 @@ export default function HomePage() {
         {result && !loading && (
           <div className="space-y-3">
             {/* 1 — Unified stock card (header + fundamentals) */}
-            <StockCard stock={result.stock} />
+            <StockCard
+              stock={result.stock}
+              newsCount={result.news.length}
+              confidence={result.analysis.confidence}
+            />
 
             {/* 2 — Hero insight card */}
             <HeroAnalysisCard
               analysis={result.analysis}
               changePercent={result.stock.changePercent}
+              symbol={result.stock.symbol}
+              companyName={result.stock.companyName}
+              heatScore={calculateHeatScore(result.stock, result.news.length, result.analysis.confidence)}
             />
 
             {/* 3 — Bull vs Bear */}
@@ -146,7 +154,7 @@ export default function HomePage() {
               bearCase={result.analysis.bearCase}
             />
 
-            {/* 4 — Related stocks */}
+            {/* 5 — Related stocks */}
             <RelatedStocks
               symbols={result.analysis.relatedSymbols}
               onSearch={handleSearch}

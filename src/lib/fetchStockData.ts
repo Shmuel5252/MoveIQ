@@ -47,6 +47,7 @@ export default async function fetchStockData(symbol: string): Promise<StockData>
       profitMargin: fin?.profitMargins ?? undefined,
       // debtToEquity from yahoo is expressed as a % (e.g. 156 = 1.56x D/E)
       debtToEquity: fin?.debtToEquity ?? undefined,
+      shortFloat: (quote as Record<string, unknown>).shortPercentOfFloat as number | undefined,
       website,
     };
   } catch (err) {

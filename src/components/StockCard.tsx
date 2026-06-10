@@ -3,9 +3,14 @@
 import { useState } from "react";
 import { StockData } from "@/lib/types";
 import CompanyLogo from "./CompanyLogo";
+import HeatScore from "./HeatScore";
+import { calculateHeatScore } from "@/lib/calculateHeatScore";
+import { calculateRSISignal } from "@/lib/calculateRSISignal";
 
 interface Props {
   stock: StockData;
+  newsCount?: number;
+  confidence?: number;
 }
 
 // ── Format helpers ────────────────────────────────────────────────────────────
@@ -64,7 +69,9 @@ function StatCell({ label, value }: { label: string; value: string }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function StockCard({ stock }: Props) {
+export default function StockCard({ stock, newsCount = 0, confidence = 0 }: Props) {
+  const heatScore = calculateHeatScore(stock, newsCount, confidence);
+  const rsiSignal = calculateRSISignal(stock.changePercent, stock.volume, stock.avgVolume);
   const [expanded, setExpanded] = useState(false);
 
   const isPositive = stock.change >= 0;
@@ -96,7 +103,7 @@ export default function StockCard({ stock }: Props) {
         {/* Right: logo + name + symbol */}
         <div className="flex items-center gap-3 min-w-0 flex-1 pr-4">
           <CompanyLogo symbol={stock.symbol} domain={stock.website} />
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-sm text-gray-400 truncate">{stock.companyName}</p>
             <p className="text-xs text-gray-500 font-mono tracking-widest mt-0.5">
               {stock.symbol}
@@ -104,15 +111,18 @@ export default function StockCard({ stock }: Props) {
           </div>
         </div>
 
-        {/* Left: price + change (always LTR) */}
-        <div dir="ltr" className="text-left shrink-0">
-          <p className="text-3xl font-bold text-white tabular-nums leading-none">
-            ${stock.price.toFixed(2)}
-          </p>
-          <p className={`text-sm font-medium tabular-nums mt-1 ${changeColor}`}>
-            {changeSign}{stock.change.toFixed(2)}&nbsp;
-            ({changeSign}{stock.changePercent.toFixed(2)}%)
-          </p>
+        {/* Left: price + change + heat score (always LTR) */}
+        <div dir="ltr" className="flex items-start gap-4 shrink-0">
+          <div className="text-left">
+            <p className="text-3xl font-bold text-white tabular-nums leading-none">
+              ${stock.price.toFixed(2)}
+            </p>
+            <p className={`text-sm font-medium tabular-nums mt-1 ${changeColor}`}>
+              {changeSign}{stock.change.toFixed(2)}&nbsp;
+              ({changeSign}{stock.changePercent.toFixed(2)}%)
+            </p>
+          </div>
+          <HeatScore score={heatScore} />
         </div>
       </div>
 
@@ -148,8 +158,34 @@ export default function StockCard({ stock }: Props) {
 
       {/* ── Secondary stats grid (expanded) ── */}
       {expanded && (
-        <div className="animate-in slide-in-from-top-2 border-t border-white/10 mx-5 pt-4 pb-5 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="animate-in slide-in-from-top-2 border-t border-white/10 mx-5 pt-4 pb-4 grid grid-cols-2 md:grid-cols-4 gap-4">
           {secondaryStats.map(s => <StatCell key={s.label} label={s.label} value={s.value} />)}
+        </div>
+      )}
+
+      {/* ── Technical indicators row (expanded) ── */}
+      {expanded && (
+        <div className="animate-in slide-in-from-top-2 border-t border-white/10 mx-5 pt-3 pb-5 flex flex-wrap gap-2">
+          {stock.shortFloat != null && stock.shortFloat > 0 && (
+            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium border ${
+              stock.shortFloat * 100 > 10
+                ? "bg-red-950/40 border-red-800/40 text-red-400"
+                : "bg-gray-800 border-gray-700 text-gray-400"
+            }`}>
+              שורט: {(stock.shortFloat * 100).toFixed(1)}%
+            </span>
+          )}
+
+          {rsiSignal === "overbought" && (
+            <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium bg-red-950/40 border border-red-800/40 text-red-400">
+              קניית יתר 🔴
+            </span>
+          )}
+          {rsiSignal === "oversold" && (
+            <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium bg-green-950/40 border border-green-800/40 text-emerald-400">
+              מכירת יתר 🟢
+            </span>
+          )}
         </div>
       )}
     </div>

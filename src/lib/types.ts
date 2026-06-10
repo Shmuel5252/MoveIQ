@@ -17,6 +17,7 @@ export interface StockData {
   revenue?: number;
   profitMargin?: number;
   debtToEquity?: number;
+  shortFloat?: number;
   website?: string;
 }
 
