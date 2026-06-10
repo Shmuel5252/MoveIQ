@@ -6,11 +6,21 @@ const yf = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 
 export default async function fetchStockData(symbol: string): Promise<StockData> {
   try {
-    const quote = await yf.quote(symbol);
+    // Run quote and quoteSummary in parallel; summary failure is non-fatal
+    const [quoteResult, summaryResult] = await Promise.allSettled([
+      yf.quote(symbol),
+      yf.quoteSummary(symbol, { modules: ["financialData"] }),
+    ]);
 
-    if (!quote || !quote.regularMarketPrice) {
+    if (quoteResult.status === "rejected" || !quoteResult.value?.regularMarketPrice) {
       throw new Error("Symbol not found");
     }
+
+    const quote = quoteResult.value;
+    const fin =
+      summaryResult.status === "fulfilled"
+        ? summaryResult.value?.financialData
+        : undefined;
 
     return {
       symbol: quote.symbol,
@@ -21,6 +31,18 @@ export default async function fetchStockData(symbol: string): Promise<StockData>
       volume: quote.regularMarketVolume ?? 0,
       avgVolume: quote.averageDailyVolume10Day ?? 0,
       marketCap: quote.marketCap,
+      peRatio: quote.trailingPE,
+      dividendYield: quote.dividendYield,
+      fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh,
+      fiftyTwoWeekLow: quote.fiftyTwoWeekLow,
+      forwardPE: quote.forwardPE,
+      beta: quote.beta,
+      eps: quote.epsTrailingTwelveMonths,
+      revenue: fin?.totalRevenue ?? undefined,
+      // profitMargins is a decimal fraction (0.25 = 25%)
+      profitMargin: fin?.profitMargins ?? undefined,
+      // debtToEquity from yahoo is expressed as a % (e.g. 156 = 1.56x D/E)
+      debtToEquity: fin?.debtToEquity ?? undefined,
     };
   } catch (err) {
     if (err instanceof Error) {

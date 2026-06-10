@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import SearchBar from "@/components/SearchBar";
 import MiniMarketMovers from "@/components/MiniMarketMovers";
-import StockHeader from "@/components/StockHeader";
+import StockCard from "@/components/StockCard";
 import HeroAnalysisCard from "@/components/HeroAnalysisCard";
 import FollowUpChat from "@/components/FollowUpChat";
 import PriceChart from "@/components/PriceChart";
@@ -125,8 +125,8 @@ export default function HomePage() {
         {/* Results */}
         {result && !loading && (
           <div className="space-y-3">
-            {/* 1 — Slim stock bar */}
-            <StockHeader stock={result.stock} language="he" />
+            {/* 1 — Unified stock card (header + fundamentals) */}
+            <StockCard stock={result.stock} />
 
             {/* 2 — Hero insight card */}
             <HeroAnalysisCard

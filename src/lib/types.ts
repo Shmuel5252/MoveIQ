@@ -7,6 +7,16 @@ export interface StockData {
   volume: number;
   avgVolume: number;
   marketCap?: number;
+  peRatio?: number;
+  dividendYield?: number;
+  fiftyTwoWeekHigh?: number;
+  fiftyTwoWeekLow?: number;
+  forwardPE?: number;
+  beta?: number;
+  eps?: number;
+  revenue?: number;
+  profitMargin?: number;
+  debtToEquity?: number;
 }
 
 export interface NewsItem {
