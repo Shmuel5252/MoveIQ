@@ -6,6 +6,7 @@ import PriceChart from "@/components/PriceChart";
 import HeroAnalysisCard from "@/components/HeroAnalysisCard";
 import NewsSection from "@/components/NewsSection";
 import { StockPageData } from "@/lib/types";
+import { calculateHeatScore } from "@/lib/calculateHeatScore";
 
 interface PageProps {
   params: { symbol: string };
@@ -64,7 +65,13 @@ export default async function StockPage({ params }: PageProps) {
 
         <StockHeader stock={data.stock} language="he" />
         <PriceChart symbol={symbol} changePercent={data.stock.changePercent} />
-        <HeroAnalysisCard analysis={data.analysis} changePercent={data.stock.changePercent} />
+        <HeroAnalysisCard
+          analysis={data.analysis}
+          changePercent={data.stock.changePercent}
+          symbol={data.stock.symbol}
+          companyName={data.stock.companyName}
+          heatScore={calculateHeatScore(data.stock, data.news.length, data.analysis.confidence)}
+        />
 
         <section className="space-y-3">
           <h2 className="text-base font-semibold text-gray-500 uppercase tracking-wide">
