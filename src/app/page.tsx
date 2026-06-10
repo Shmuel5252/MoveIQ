@@ -1,101 +1,120 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useEffect } from "react";
+import SearchBar from "@/components/SearchBar";
+import MiniMarketMovers from "@/components/MiniMarketMovers";
+import StockHeader from "@/components/StockHeader";
+import PriceChart from "@/components/PriceChart";
+import AnalysisCard from "@/components/AnalysisCard";
+import NewsSection from "@/components/NewsSection";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
+import { StockPageData } from "@/lib/types";
+
+const LOADING_MESSAGES = [
+  "מושך נתוני מניה...",
+  "מנתח חדשות...",
+  "מתרגם ומסכם...",
+  "כמעט מוכן...",
+];
+
+export default function HomePage() {
+  const [loading, setLoading] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState(LOADING_MESSAGES[0]);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<StockPageData | null>(null);
+
+  useEffect(() => {
+    if (!loading) return;
+    let idx = 0;
+    const timer = setInterval(() => {
+      idx = (idx + 1) % LOADING_MESSAGES.length;
+      setLoadingMsg(LOADING_MESSAGES[idx]);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [loading]);
+
+  async function handleSearch(symbol: string) {
+    setLoading(true);
+    setLoadingMsg(LOADING_MESSAGES[0]);
+    setError(null);
+    setResult(null);
+
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ symbol, language: "he" }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error ?? "ניתוח נכשל");
+      }
+
+      setResult(data as StockPageData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "ניתוח נכשל");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div dir="rtl" className="min-h-screen bg-gray-50 text-gray-900">
+      <div className="max-w-2xl mx-auto px-4 py-10 sm:py-16 space-y-10">
+        {/* Hero / Search */}
+        <div className={`space-y-4 ${result || loading ? "" : "py-10 sm:py-20"}`}>
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-gray-900">
+              למה המניה זזה?
+            </h1>
+            {!result && !loading && (
+              <p className="text-gray-500 text-base sm:text-lg">
+                הכנס סימול מניה וקבל ניתוח AI של התנועה
+              </p>
+            )}
+          </div>
+          <SearchBar onSearch={handleSearch} loading={loading} />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          {!result && !loading && (
+            <MiniMarketMovers onSearch={handleSearch} />
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Error */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-4 text-sm font-medium">
+            {error}
+          </div>
+        )}
+
+        {/* Loading */}
+        {loading && (
+          <div className="space-y-5">
+            <p className="text-center text-gray-500 text-base font-medium animate-pulse">
+              {loadingMsg}
+            </p>
+            <LoadingSkeleton />
+          </div>
+        )}
+
+        {/* Results */}
+        {result && !loading && (
+          <div className="space-y-5">
+            <StockHeader stock={result.stock} language="he" />
+            <PriceChart symbol={result.stock.symbol} changePercent={result.stock.changePercent} />
+            <AnalysisCard analysis={result.analysis} />
+
+            <section className="space-y-3">
+              <h2 className="text-base font-semibold text-gray-500 uppercase tracking-wide">
+                חדשות אחרונות
+              </h2>
+              <NewsSection news={result.analysis.enrichedNews} />
+            </section>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

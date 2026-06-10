@@ -1,0 +1,131 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { StockData, NewsItem, AnalysisResult } from "./types";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? "");
+
+const FALLBACK: AnalysisResult = {
+  mainReason: "ניתוח נכשל",
+  confidence: 0,
+  confidenceLevel: "low",
+  factors: [],
+  language: "he",
+  enrichedNews: [],
+};
+
+function buildPrompt(stock: StockData, news: NewsItem[]): string {
+  const direction = stock.change >= 0 ? "עלתה" : "ירדה";
+  const noNewsReason = "לא נמצאו חדשות רלוונטיות להסביר את תנועה זו";
+
+  const newsBlock =
+    news.length > 0
+      ? news
+          .map(
+            (item, i) =>
+              `[${i + 1}] title: ${item.title}\n    summary: ${item.summary || "No summary."}\n    url: ${item.url}\n    source: ${item.source}\n    publishedAt: ${item.publishedAt}`
+          )
+          .join("\n\n")
+      : "No recent news available.";
+
+  return `אתה אנליסט פיננסי. נתח מדוע מניית ${stock.companyName} (${stock.symbol}) ${direction} ב-${Math.abs(stock.changePercent).toFixed(2)}% היום.
+
+חדשות אחרונות על החברה:
+${newsBlock}
+
+הנחיות:
+- הגב אך ורק ב-JSON תקין. ללא markdown, ללא גדר קוד, ללא הסבר.
+- כתוב את mainReason ואת שמות הגורמים (factors.name) בעברית.
+- confidenceLevel חייב להיות "high" אם confidence >= 70, "medium" אם >= 40, אחרת "low".
+- אם החדשות אינן מסבירות בבירור את תנועת המניה, הגדר mainReason ל-"${noNewsReason}", confidence ל-0, confidenceLevel ל-"low", ו-factors למערך ריק.
+- עבור כל כתבת חדשות: תרגם את הכותרת לעברית (title_he), כתוב סיכום בעברית של 2-3 משפטים (summary_he) בהתבסס אך ורק על שדה ה-summary המקורי — אל תמציא עובדות. העתק את url, source ו-publishedAt ללא שינוי.
+- CRITICAL: For the 'impact' field in factors, you MUST use whole integer numbers between 0 and 100. Do NOT use decimals or fractions (e.g., use 70, never 0.7). The impacts represent independent scores of importance, they do NOT need to sum up to 100.
+- CRITICAL: Do NOT use double-quote characters (") inside Hebrew string values. For Hebrew abbreviations that normally use double-quote (like ארה"ב or נאסד"ק), write them without the quote (ארהב, נאסדק) or spell them out fully.
+
+החזר בדיוק את מבנה ה-JSON הזה:
+{
+  "mainReason": "string",
+  "confidence": number,
+  "confidenceLevel": "high" | "medium" | "low",
+  "factors": [{ "name": "string", "impact": integer (0-100) }],
+  "enrichedNews": [
+    {
+      "title_he": "string",
+      "summary_he": "string",
+      "url": "string",
+      "source": "string",
+      "publishedAt": "string"
+    }
+  ]
+}`;
+}
+
+/**
+ * Escapes literal control characters inside JSON string values only,
+ * leaving structural whitespace intact.
+ */
+function sanitizeJson(s: string): string {
+  let out = "";
+  let inStr = false;
+  let esc = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (esc) { out += c; esc = false; continue; }
+    if (c === "\\" && inStr) { esc = true; out += c; continue; }
+    if (c === '"') { inStr = !inStr; out += c; continue; }
+    if (inStr) {
+      if (c === "\n") { out += "\\n"; continue; }
+      if (c === "\r") { out += "\\r"; continue; }
+      if (c === "\t") { out += "\\t"; continue; }
+    }
+    out += c;
+  }
+  return out;
+}
+
+export default async function analyzeMove(
+  stock: StockData,
+  news: NewsItem[]
+): Promise<AnalysisResult> {
+  process.stdout.write(`[analyzeMove] received ${news.length} articles\n`);
+
+  if (news.length === 0) {
+    return {
+      mainReason: "לא נמצאו חדשות זמינות עבור מניה זו",
+      confidence: 0,
+      confidenceLevel: "low",
+      factors: [],
+      language: "he",
+      enrichedNews: [],
+    };
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({
+      model: "gemini-flash-lite-latest",
+      generationConfig: {
+        responseMimeType: "application/json",
+      },
+    });
+    const result = await model.generateContent(buildPrompt(stock, news));
+    const raw = sanitizeJson(
+      result.response
+        .text()
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/```\s*$/i, "")
+        .trim()
+    );
+
+    const parsed = JSON.parse(raw);
+
+    return {
+      mainReason: parsed.mainReason,
+      confidence: parsed.confidence,
+      confidenceLevel: parsed.confidenceLevel,
+      factors: parsed.factors ?? [],
+      language: "he",
+      enrichedNews: parsed.enrichedNews ?? [],
+    };
+  } catch (error) {
+    process.stdout.write(`[analyzeMove] error: ${String(error)}\n`);
+    return { ...FALLBACK };
+  }
+}
