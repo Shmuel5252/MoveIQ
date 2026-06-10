@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import SearchBar from "@/components/SearchBar";
 import MiniMarketMovers from "@/components/MiniMarketMovers";
 import StockHeader from "@/components/StockHeader";
+import HeroAnalysisCard from "@/components/HeroAnalysisCard";
 import PriceChart from "@/components/PriceChart";
-import AnalysisCard from "@/components/AnalysisCard";
 import NewsSection from "@/components/NewsSection";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
+import Timeline from "@/components/Timeline";
+import { buildTimeline, TimelineEvent, ChartPoint } from "@/lib/buildTimeline";
 import { StockPageData } from "@/lib/types";
 
 const LOADING_MESSAGES = [
@@ -22,6 +24,8 @@ export default function HomePage() {
   const [loadingMsg, setLoadingMsg] = useState(LOADING_MESSAGES[0]);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<StockPageData | null>(null);
+  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
+  const [activeTab, setActiveTab] = useState<"chart" | "timeline" | "news">("chart");
 
   useEffect(() => {
     if (!loading) return;
@@ -32,6 +36,17 @@ export default function HomePage() {
     }, 2000);
     return () => clearInterval(timer);
   }, [loading]);
+
+  useEffect(() => {
+    if (!result) { setTimelineEvents([]); return; }
+    setActiveTab("chart");
+    fetch(`/api/chart?symbol=${result.stock.symbol}&interval=15m&range=1d`)
+      .then((r) => r.json())
+      .then((chartData: ChartPoint[]) => {
+        setTimelineEvents(buildTimeline(result.stock, result.analysis.enrichedNews, chartData));
+      })
+      .catch(() => setTimelineEvents([]));
+  }, [result]);
 
   async function handleSearch(symbol: string) {
     setLoading(true);
@@ -108,17 +123,64 @@ export default function HomePage() {
 
         {/* Results */}
         {result && !loading && (
-          <div className="space-y-5">
+          <div className="space-y-3">
+            {/* 1 — Slim stock bar */}
             <StockHeader stock={result.stock} language="he" />
-            <PriceChart symbol={result.stock.symbol} changePercent={result.stock.changePercent} />
-            <AnalysisCard analysis={result.analysis} />
 
-            <section className="space-y-3">
-              <h2 className="text-base font-semibold text-gray-500 uppercase tracking-wide">
-                חדשות אחרונות
-              </h2>
-              <NewsSection news={result.analysis.enrichedNews} />
-            </section>
+            {/* 2 — Hero insight card */}
+            <HeroAnalysisCard
+              analysis={result.analysis}
+              changePercent={result.stock.changePercent}
+            />
+
+            {/* 3 + 4 — Tabs nav + tab content */}
+            <div className="space-y-3">
+              <div className="flex border-b border-gray-700" dir="rtl">
+                {(
+                  [
+                    { id: "chart", label: "גרף מניה" },
+                    { id: "timeline", label: "ציר זמן" },
+                    { id: "news", label: "חדשות אחרונות" },
+                  ] as const
+                ).map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`pb-2 px-1 ml-5 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                      activeTab === tab.id
+                        ? "text-blue-500 border-blue-500"
+                        : "text-gray-400 border-transparent hover:text-gray-500"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              <div key={activeTab} className="animate-fade-in">
+                {activeTab === "chart" && (
+                  <PriceChart
+                    symbol={result.stock.symbol}
+                    changePercent={result.stock.changePercent}
+                  />
+                )}
+                {activeTab === "timeline" && (
+                  timelineEvents.length >= 3 ? (
+                    <div className="bg-[#131722] rounded-2xl px-5 py-4">
+                      <Timeline events={timelineEvents} />
+                    </div>
+                  ) : (
+                    <p className="text-gray-400 text-sm text-center py-10">
+                      אין מספיק נתוני ציר זמן להצגה
+                    </p>
+                  )
+                )}
+                {activeTab === "news" && (
+                  <NewsSection news={result.analysis.enrichedNews} />
+                )}
+              </div>
+            </div>
+
           </div>
         )}
       </div>

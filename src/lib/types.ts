@@ -27,6 +27,8 @@ export interface EnrichedNewsItem {
 }
 
 export interface AnalysisResult {
+  oneLiner: string;
+  detailedExplanation: string;
   mainReason: string;
   confidence: number;
   confidenceLevel: "high" | "medium" | "low";
