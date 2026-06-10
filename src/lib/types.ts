@@ -48,6 +48,9 @@ export interface AnalysisResult {
     impact: number;
   }>;
   suggestedQuestions: string[];
+  bullCase: string[];
+  bearCase: string[];
+  relatedSymbols: string[];
   language: "he" | "en";
   enrichedNews: EnrichedNewsItem[];
 }

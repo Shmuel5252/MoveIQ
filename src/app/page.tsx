@@ -9,7 +9,10 @@ import FollowUpChat from "@/components/FollowUpChat";
 import PriceChart from "@/components/PriceChart";
 import NewsSection from "@/components/NewsSection";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
+import MarketPulse from "@/components/MarketPulse";
 import Timeline from "@/components/Timeline";
+import BullBearCard from "@/components/BullBearCard";
+import RelatedStocks from "@/components/RelatedStocks";
 import { buildTimeline, TimelineEvent, ChartPoint } from "@/lib/buildTimeline";
 import { StockPageData } from "@/lib/types";
 
@@ -98,6 +101,9 @@ export default function HomePage() {
               </p>
             )}
           </div>
+
+          {!result && !loading && <MarketPulse />}
+
           <SearchBar onSearch={handleSearch} loading={loading} />
 
           {!result && !loading && (
@@ -134,7 +140,19 @@ export default function HomePage() {
               changePercent={result.stock.changePercent}
             />
 
-            {/* 3 — Follow-up chat */}
+            {/* 3 — Bull vs Bear */}
+            <BullBearCard
+              bullCase={result.analysis.bullCase}
+              bearCase={result.analysis.bearCase}
+            />
+
+            {/* 4 — Related stocks */}
+            <RelatedStocks
+              symbols={result.analysis.relatedSymbols}
+              onSearch={handleSearch}
+            />
+
+            {/* 5 — Follow-up chat */}
             <FollowUpChat
               symbol={result.stock.symbol}
               companyName={result.stock.companyName}
@@ -142,7 +160,7 @@ export default function HomePage() {
               dynamicQuestions={result.analysis.suggestedQuestions}
             />
 
-            {/* 4 + 5 — Tabs nav + tab content */}
+            {/* 6 — Tabs nav + tab content */}
             <div className="space-y-3">
               <div className="flex border-b border-gray-700" dir="rtl">
                 {(

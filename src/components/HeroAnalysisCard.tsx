@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { AnalysisResult } from "@/lib/types";
 import ConfidenceBadge from "./ConfidenceBadge";
 
@@ -7,8 +10,12 @@ interface Props {
 }
 
 export default function HeroAnalysisCard({ analysis, changePercent }: Props) {
+  const [expanded, setExpanded] = useState(false);
+
   const accentBorder =
     changePercent >= 0 ? "border-r-4 border-r-green-500" : "border-r-4 border-r-red-500";
+
+  const hasDetails = !!analysis.detailedExplanation;
 
   return (
     <div
@@ -45,6 +52,28 @@ export default function HeroAnalysisCard({ analysis, changePercent }: Props) {
             ))}
           </ul>
         </div>
+      )}
+
+      {/* Expandable detailed explanation */}
+      {hasDetails && (
+        <>
+          <div
+            className={`overflow-hidden transition-all duration-300 ${
+              expanded ? "max-h-96" : "max-h-0"
+            }`}
+          >
+            <p className="text-slate-300 text-sm leading-relaxed pt-1 border-t border-slate-700/60">
+              {analysis.detailedExplanation}
+            </p>
+          </div>
+
+          <button
+            onClick={() => setExpanded((p) => !p)}
+            className="text-xs text-slate-400 hover:text-white transition-colors pt-1"
+          >
+            {expanded ? "סגור ▲" : "קרא עוד ▼"}
+          </button>
+        </>
       )}
     </div>
   );

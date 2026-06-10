@@ -11,6 +11,9 @@ const FALLBACK: AnalysisResult = {
   confidenceLevel: "low",
   factors: [],
   suggestedQuestions: [],
+  bullCase: [],
+  bearCase: [],
+  relatedSymbols: [],
   language: "he",
   enrichedNews: [],
 };
@@ -45,6 +48,9 @@ ${newsBlock}
 - oneLiner: MUST be exactly 5-10 words in Hebrew. Think like a Bloomberg terminal headline. NEVER use filler phrases like "המניה ירדה בשל" or "המניה עלתה כי" — just state the catalyst directly. EXAMPLE (do not copy verbatim): "מתיחות גיאופוליטית ומימושי רווחים חדים בסקטור השבבים."
 - suggestedQuestions: Generate exactly 3 highly relevant follow-up questions in Hebrew based specifically on this exact news event. Focus on fundamental analysis, potential impact on intrinsic value, earnings multipliers, or long-term core business metrics. DO NOT use generic or static questions. Frame them from the perspective of a serious investor looking for deep value. Return as a JSON array of 3 strings.
 - detailedExplanation: MUST be a full paragraph of 2-3 long Hebrew sentences containing specific details, numbers, or context from the provided news. DO NOT repeat the oneLiner. If the provided news data is sparse or lacks deep detail, DO NOT hallucinate or repeat the core reason. Instead, provide a brief analysis based strictly on the available data, and explicitly mention that market sentiment is still developing or that specific catalysts are limited at this hour. EXAMPLE (do not copy verbatim): "המשקיעים מגיבים בחשש להסלמה במזרח התיכון, שגוררת ירידות שערים רוחביות. במקביל, לאחר ראלי ארוך מתחילת השנה, קרנות גיבוי מנצלות את ההזדמנות למימוש רווחים מהיר במניות הטכנולוגיה, מה שמכביד על מחיר המניה באופן נקודתי."
+- bullCase: List exactly 3 concise bullish arguments for this stock in Hebrew. Each argument is 1 sentence max. Base them on the news and fundamentals provided.
+- bearCase: List exactly 3 concise bearish arguments for this stock in Hebrew. Each argument is 1 sentence max. Be honest about risks and headwinds.
+- relatedSymbols: List 4-5 ticker symbols (e.g. "AAPL", "MSFT") of companies in the same sector that would be affected by the same news catalyst. Return ONLY the ticker symbols as strings, no company names.
 
 החזר בדיוק את מבנה ה-JSON הזה:
 {
@@ -55,6 +61,9 @@ ${newsBlock}
   "confidenceLevel": "high" | "medium" | "low",
   "factors": [{ "name": "string", "impact": integer (0-100) }],
   "suggestedQuestions": ["string", "string", "string"],
+  "bullCase": ["string", "string", "string"],
+  "bearCase": ["string", "string", "string"],
+  "relatedSymbols": ["string", "string", "string", "string"],
   "enrichedNews": [
     {
       "title_he": "string",
@@ -105,6 +114,9 @@ export default async function analyzeMove(
       confidenceLevel: "low",
       factors: [],
       suggestedQuestions: [],
+      bullCase: [],
+      bearCase: [],
+      relatedSymbols: [],
       language: "he",
       enrichedNews: [],
     };
@@ -136,6 +148,9 @@ export default async function analyzeMove(
       confidenceLevel: parsed.confidenceLevel,
       factors: parsed.factors ?? [],
       suggestedQuestions: parsed.suggestedQuestions ?? [],
+      bullCase: parsed.bullCase ?? [],
+      bearCase: parsed.bearCase ?? [],
+      relatedSymbols: parsed.relatedSymbols ?? [],
       language: "he",
       enrichedNews: parsed.enrichedNews ?? [],
     };
