@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import StockHeader from "@/components/StockHeader";
 import PriceChart from "@/components/PriceChart";
-import AnalysisCard from "@/components/AnalysisCard";
+import HeroAnalysisCard from "@/components/HeroAnalysisCard";
 import NewsSection from "@/components/NewsSection";
 import { StockPageData } from "@/lib/types";
 
@@ -64,7 +64,7 @@ export default async function StockPage({ params }: PageProps) {
 
         <StockHeader stock={data.stock} language="he" />
         <PriceChart symbol={symbol} changePercent={data.stock.changePercent} />
-        <AnalysisCard analysis={data.analysis} />
+        <HeroAnalysisCard analysis={data.analysis} changePercent={data.stock.changePercent} />
 
         <section className="space-y-3">
           <h2 className="text-base font-semibold text-gray-500 uppercase tracking-wide">
