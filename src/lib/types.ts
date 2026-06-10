@@ -36,6 +36,7 @@ export interface AnalysisResult {
     name: string;
     impact: number;
   }>;
+  suggestedQuestions: string[];
   language: "he" | "en";
   enrichedNews: EnrichedNewsItem[];
 }

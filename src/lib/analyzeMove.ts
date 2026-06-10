@@ -10,6 +10,7 @@ const FALLBACK: AnalysisResult = {
   confidence: 0,
   confidenceLevel: "low",
   factors: [],
+  suggestedQuestions: [],
   language: "he",
   enrichedNews: [],
 };
@@ -42,6 +43,7 @@ ${newsBlock}
 - CRITICAL: For the 'impact' field in factors, you MUST use whole integer numbers between 0 and 100. Do NOT use decimals or fractions (e.g., use 70, never 0.7). The impacts represent independent scores of importance, they do NOT need to sum up to 100.
 - CRITICAL: Do NOT use double-quote characters (") inside Hebrew string values. For Hebrew abbreviations that normally use double-quote (like ארה"ב or נאסד"ק), write them without the quote (ארהב, נאסדק) or spell them out fully.
 - oneLiner: MUST be exactly 5-10 words in Hebrew. Think like a Bloomberg terminal headline. NEVER use filler phrases like "המניה ירדה בשל" or "המניה עלתה כי" — just state the catalyst directly. EXAMPLE (do not copy verbatim): "מתיחות גיאופוליטית ומימושי רווחים חדים בסקטור השבבים."
+- suggestedQuestions: Generate exactly 3 highly relevant follow-up questions in Hebrew based specifically on this exact news event. Focus on fundamental analysis, potential impact on intrinsic value, earnings multipliers, or long-term core business metrics. DO NOT use generic or static questions. Frame them from the perspective of a serious investor looking for deep value. Return as a JSON array of 3 strings.
 - detailedExplanation: MUST be a full paragraph of 2-3 long Hebrew sentences containing specific details, numbers, or context from the provided news. DO NOT repeat the oneLiner. If the provided news data is sparse or lacks deep detail, DO NOT hallucinate or repeat the core reason. Instead, provide a brief analysis based strictly on the available data, and explicitly mention that market sentiment is still developing or that specific catalysts are limited at this hour. EXAMPLE (do not copy verbatim): "המשקיעים מגיבים בחשש להסלמה במזרח התיכון, שגוררת ירידות שערים רוחביות. במקביל, לאחר ראלי ארוך מתחילת השנה, קרנות גיבוי מנצלות את ההזדמנות למימוש רווחים מהיר במניות הטכנולוגיה, מה שמכביד על מחיר המניה באופן נקודתי."
 
 החזר בדיוק את מבנה ה-JSON הזה:
@@ -52,6 +54,7 @@ ${newsBlock}
   "confidence": number,
   "confidenceLevel": "high" | "medium" | "low",
   "factors": [{ "name": "string", "impact": integer (0-100) }],
+  "suggestedQuestions": ["string", "string", "string"],
   "enrichedNews": [
     {
       "title_he": "string",
@@ -101,6 +104,7 @@ export default async function analyzeMove(
       confidence: 0,
       confidenceLevel: "low",
       factors: [],
+      suggestedQuestions: [],
       language: "he",
       enrichedNews: [],
     };
@@ -131,6 +135,7 @@ export default async function analyzeMove(
       confidence: parsed.confidence,
       confidenceLevel: parsed.confidenceLevel,
       factors: parsed.factors ?? [],
+      suggestedQuestions: parsed.suggestedQuestions ?? [],
       language: "he",
       enrichedNews: parsed.enrichedNews ?? [],
     };

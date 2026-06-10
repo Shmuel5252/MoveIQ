@@ -5,6 +5,7 @@ import SearchBar from "@/components/SearchBar";
 import MiniMarketMovers from "@/components/MiniMarketMovers";
 import StockHeader from "@/components/StockHeader";
 import HeroAnalysisCard from "@/components/HeroAnalysisCard";
+import FollowUpChat from "@/components/FollowUpChat";
 import PriceChart from "@/components/PriceChart";
 import NewsSection from "@/components/NewsSection";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
@@ -133,7 +134,15 @@ export default function HomePage() {
               changePercent={result.stock.changePercent}
             />
 
-            {/* 3 + 4 — Tabs nav + tab content */}
+            {/* 3 — Follow-up chat */}
+            <FollowUpChat
+              symbol={result.stock.symbol}
+              companyName={result.stock.companyName}
+              context={`${result.analysis.oneLiner}\n\n${result.analysis.detailedExplanation}`}
+              dynamicQuestions={result.analysis.suggestedQuestions}
+            />
+
+            {/* 4 + 5 — Tabs nav + tab content */}
             <div className="space-y-3">
               <div className="flex border-b border-gray-700" dir="rtl">
                 {(
