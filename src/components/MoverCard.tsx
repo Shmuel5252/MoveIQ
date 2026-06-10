@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import CompanyLogo from "./CompanyLogo";
+import { getDomainFromCompanyName } from "@/lib/getDomain";
 
 export interface MoverData {
   symbol: string;
@@ -18,6 +22,7 @@ export default function MoverCard({ mover, type }: Props) {
   const changeColor = isGainer ? "text-emerald-400" : "text-red-400";
   const accentColor = isGainer ? "#10b981" : "#ef4444";
   const sign = isGainer ? "+" : "";
+  const domain = getDomainFromCompanyName(mover.name);
 
   return (
     <Link
@@ -25,6 +30,8 @@ export default function MoverCard({ mover, type }: Props) {
       className="flex items-start gap-4 bg-gray-900 rounded-2xl p-4 hover:bg-gray-800/80 transition-colors border border-gray-800"
       style={{ borderLeft: `4px solid ${accentColor}` }}
     >
+      <CompanyLogo symbol={mover.symbol} domain={domain} size="sm" />
+
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 mb-0.5">
           <span className="text-white font-bold text-base font-mono tracking-wider">
@@ -38,6 +45,7 @@ export default function MoverCard({ mover, type }: Props) {
           </p>
         )}
       </div>
+
       <div className="text-right shrink-0">
         <p className="text-white font-semibold text-sm">${mover.price.toFixed(2)}</p>
         <p className={`${changeColor} font-bold text-sm`}>

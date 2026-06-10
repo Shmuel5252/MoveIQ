@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { StockData } from "@/lib/types";
+import CompanyLogo from "./CompanyLogo";
 
 interface Props {
   stock: StockData;
@@ -92,12 +93,15 @@ export default function StockCard({ stock }: Props) {
     <div dir="rtl" className="bg-gray-900 rounded-2xl overflow-hidden">
       {/* ── Top: company info + price ── */}
       <div className="flex items-start justify-between px-5 pt-5 pb-4">
-        {/* Right: name + symbol */}
-        <div className="min-w-0 flex-1 pr-4">
-          <p className="text-sm text-gray-400 truncate">{stock.companyName}</p>
-          <p className="text-xs text-gray-500 font-mono tracking-widest mt-0.5">
-            {stock.symbol}
-          </p>
+        {/* Right: logo + name + symbol */}
+        <div className="flex items-center gap-3 min-w-0 flex-1 pr-4">
+          <CompanyLogo symbol={stock.symbol} domain={stock.website} />
+          <div className="min-w-0">
+            <p className="text-sm text-gray-400 truncate">{stock.companyName}</p>
+            <p className="text-xs text-gray-500 font-mono tracking-widest mt-0.5">
+              {stock.symbol}
+            </p>
+          </div>
         </div>
 
         {/* Left: price + change (always LTR) */}

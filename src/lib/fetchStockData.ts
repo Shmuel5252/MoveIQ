@@ -1,6 +1,7 @@
 
 import YahooFinance from "yahoo-finance2";
 import { StockData } from "./types";
+import { getDomainFromCompanyName, normalizeDomain } from "./getDomain";
 
 const yf = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 
@@ -9,7 +10,7 @@ export default async function fetchStockData(symbol: string): Promise<StockData>
     // Run quote and quoteSummary in parallel; summary failure is non-fatal
     const [quoteResult, summaryResult] = await Promise.allSettled([
       yf.quote(symbol),
-      yf.quoteSummary(symbol, { modules: ["financialData"] }),
+      yf.quoteSummary(symbol, { modules: ["financialData", "assetProfile"] }),
     ]);
 
     if (quoteResult.status === "rejected" || !quoteResult.value?.regularMarketPrice) {
@@ -17,10 +18,13 @@ export default async function fetchStockData(symbol: string): Promise<StockData>
     }
 
     const quote = quoteResult.value;
-    const fin =
-      summaryResult.status === "fulfilled"
-        ? summaryResult.value?.financialData
-        : undefined;
+    const summary = summaryResult.status === "fulfilled" ? summaryResult.value : undefined;
+    const fin = summary?.financialData;
+
+    const rawWebsite = summary?.assetProfile?.website;
+    const website = rawWebsite
+      ? normalizeDomain(rawWebsite)
+      : getDomainFromCompanyName(quote.shortName ?? symbol);
 
     return {
       symbol: quote.symbol,
@@ -43,6 +47,7 @@ export default async function fetchStockData(symbol: string): Promise<StockData>
       profitMargin: fin?.profitMargins ?? undefined,
       // debtToEquity from yahoo is expressed as a % (e.g. 156 = 1.56x D/E)
       debtToEquity: fin?.debtToEquity ?? undefined,
+      website,
     };
   } catch (err) {
     if (err instanceof Error) {
