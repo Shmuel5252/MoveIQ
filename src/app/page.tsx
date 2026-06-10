@@ -61,11 +61,18 @@ export default function HomePage() {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="max-w-2xl mx-auto px-4 py-10 sm:py-16 space-y-10">
+    <div dir="rtl" className="flex-1 flex flex-col justify-center bg-gray-50 text-gray-900">
+      <div className="max-w-2xl mx-auto w-full px-4 py-6 space-y-6">
         {/* Hero / Search */}
-        <div className={`space-y-4 ${result || loading ? "" : "py-10 sm:py-20"}`}>
-          <div className="text-center space-y-2">
+        <div className={`space-y-3 ${result || loading ? "" : "py-4 sm:py-8"}`}>
+          <div className="text-center space-y-1">
+            {!result && !loading && (
+              <div className="flex justify-center mb-1">
+                <span className="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200/60 text-slate-600 px-3 py-1 rounded-full text-xs font-medium mb-3 shadow-sm">
+                  ⚡ ניתוח AI בזמן אמת
+                </span>
+              </div>
+            )}
             <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-gray-900">
               למה המניה זזה?
             </h1>
