@@ -259,10 +259,10 @@ export default function SearchBar({ onSearch, loading }: Props) {
                   d="M4 12a8 8 0 018-8v8H4z"
                 />
               </svg>
-              מנתח...
+              טוען...
             </>
           ) : (
-            "נתח מניה"
+            "חפש מניה"
           )}
         </button>
       </form>
