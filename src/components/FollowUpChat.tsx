@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { MessageCircle } from "lucide-react";
 
 interface Props {
   symbol: string;
@@ -48,7 +49,10 @@ export default function FollowUpChat({ symbol, companyName, context, dynamicQues
 
   return (
     <div dir="rtl" className="bg-gray-900 rounded-2xl p-5 space-y-4">
-      <p className="text-xs text-slate-400 uppercase tracking-wide">💬 שאל שאלת המשך</p>
+      <p className="flex items-center gap-1.5 text-xs text-slate-400 uppercase tracking-wide">
+        <MessageCircle size={13} strokeWidth={1.75} />
+        שאל שאלת המשך
+      </p>
 
       {/* Dynamic question chips */}
       {dynamicQuestions.length > 0 && (

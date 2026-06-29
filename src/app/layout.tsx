@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+// @ts-ignore
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -16,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "MoveIQ — למה המניה זזה?",
+  title: "MoveIQ — ניתוח השוק",
   description: "ניתוח AI של תנועות מניות בזמן אמת",
 };
 

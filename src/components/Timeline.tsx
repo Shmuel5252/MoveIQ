@@ -1,5 +1,6 @@
 "use client";
 
+import { Bell, Newspaper, TrendingUp, TrendingDown } from "lucide-react";
 import { TimelineEvent } from "@/lib/buildTimeline";
 
 interface Props {
@@ -27,17 +28,17 @@ export default function Timeline({ events }: Props) {
       {events.map((event, i) => {
         const isLast = i === events.length - 1;
 
-        let icon: string;
+        let Icon: typeof Bell;
         let dotColor: string;
 
         if (event.type === "market") {
-          icon = "🔔";
+          Icon = Bell;
           dotColor = "bg-blue-500";
         } else if (event.type === "news") {
-          icon = "📰";
+          Icon = Newspaper;
           dotColor = "bg-slate-600";
         } else {
-          icon = event.direction === "up" ? "📈" : "📉";
+          Icon = event.direction === "up" ? TrendingUp : TrendingDown;
           dotColor = event.direction === "up" ? "bg-emerald-500" : "bg-red-500";
         }
 
@@ -59,7 +60,7 @@ export default function Timeline({ events }: Props) {
 
             {/* Event content — description always light, only pct token colored */}
             <div className="flex items-start gap-1.5 pb-3 min-w-0 text-slate-200">
-              <span className="text-sm leading-snug shrink-0">{icon}</span>
+              <Icon size={14} strokeWidth={1.75} className="text-slate-500 shrink-0 mt-0.5" />
               <span className="text-sm leading-snug">
                 {event.type === "price"
                   ? <PriceDescription description={event.description} direction={event.direction} />

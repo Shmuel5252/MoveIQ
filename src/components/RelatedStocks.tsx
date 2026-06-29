@@ -16,7 +16,7 @@ export default function RelatedStocks({ symbols, onSearch }: Props) {
           <button
             key={sym}
             onClick={() => onSearch(sym)}
-            className="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-blue-600 border border-gray-700 hover:border-blue-500 text-sm font-mono font-semibold text-gray-200 hover:text-white transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-blue-600 border border-gray-700 hover:border-blue-500 text-sm font-mono font-semibold text-gray-200 hover:text-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-blue-900/30"
           >
             {sym}
           </button>

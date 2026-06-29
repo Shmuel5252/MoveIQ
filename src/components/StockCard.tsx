@@ -178,12 +178,12 @@ export default function StockCard({ stock, newsCount = 0, confidence = 0 }: Prop
 
           {rsiSignal === "overbought" && (
             <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium bg-red-950/40 border border-red-800/40 text-red-400">
-              קניית יתר 🔴
+              קניית יתר
             </span>
           )}
           {rsiSignal === "oversold" && (
             <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium bg-green-950/40 border border-green-800/40 text-emerald-400">
-              מכירת יתר 🟢
+              מכירת יתר
             </span>
           )}
         </div>

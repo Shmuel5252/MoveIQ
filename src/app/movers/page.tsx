@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
+import { TrendingUp } from "lucide-react";
 import YahooFinance from "yahoo-finance2";
 import fetchNews from "@/lib/fetchNews";
 import analyzeMove from "@/lib/analyzeMove";
@@ -73,8 +74,9 @@ export default async function MoversPage() {
       <div className="max-w-2xl mx-auto px-4 py-10 sm:py-16">
         <div className="flex items-start justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-              📈 Market Movers
+            <h1 className="flex items-center gap-2 text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
+              <TrendingUp size={28} strokeWidth={2} />
+              Market Movers
             </h1>
             <p className="text-gray-500 text-sm mt-1">
               המניות עם השינוי החד ביותר לפי תקופה

@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { BarChart3, Flame, Target, Sparkle } from "lucide-react";
 
 interface Props {
   symbol: string;
@@ -61,8 +62,18 @@ const ShareTemplate = forwardRef<HTMLDivElement, Props>(function ShareTemplate(
           borderBottom: "1px solid rgba(255,255,255,0.07)",
         }}
       >
-        <span style={{ fontSize: "13px", color: "#64748b", letterSpacing: "0.05em" }}>
-          📊 ניתוח AI · MoveIQ
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            fontSize: "13px",
+            color: "#64748b",
+            letterSpacing: "0.05em",
+          }}
+        >
+          <BarChart3 size={14} strokeWidth={1.75} color="#64748b" />
+          ניתוח AI · MoveIQ
         </span>
         <span style={{ fontSize: "11px", color: "#475569" }}>move-iq-one.vercel.app</span>
       </div>
@@ -107,8 +118,18 @@ const ShareTemplate = forwardRef<HTMLDivElement, Props>(function ShareTemplate(
             >
               {sign}{changePercent.toFixed(2)}%
             </span>
-            <span style={{ fontSize: "13px", color: heatColor, textAlign: "left" }}>
-              🔥 Heat {heatScore}
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                fontSize: "13px",
+                color: heatColor,
+                textAlign: "left",
+              }}
+            >
+              <Flame size={13} strokeWidth={2} color={heatColor} />
+              Heat {heatScore}
             </span>
           </div>
         </div>
@@ -125,6 +146,9 @@ const ShareTemplate = forwardRef<HTMLDivElement, Props>(function ShareTemplate(
         {/* oneLiner */}
         <div
           style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "8px",
             fontSize: "20px",
             fontWeight: "600",
             color: "#e2e8f0",
@@ -132,7 +156,8 @@ const ShareTemplate = forwardRef<HTMLDivElement, Props>(function ShareTemplate(
             marginBottom: "24px",
           }}
         >
-          🎯 {oneLiner}
+          <Target size={18} strokeWidth={1.75} color="#64748b" style={{ marginTop: "3px", flexShrink: 0 }} />
+          <span>{oneLiner}</span>
         </div>
 
         {/* Confidence bar */}
@@ -185,13 +210,17 @@ const ShareTemplate = forwardRef<HTMLDivElement, Props>(function ShareTemplate(
         </span>
         <span
           style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
             fontSize: "14px",
             fontWeight: "700",
             color: "#3b82f6",
             letterSpacing: "-0.01em",
           }}
         >
-          MoveIQ ✦
+          MoveIQ
+          <Sparkle size={13} strokeWidth={2} color="#3b82f6" />
         </span>
       </div>
     </div>

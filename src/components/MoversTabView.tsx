@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { Calendar } from "lucide-react";
 import MoverCard, { type MoverData } from "./MoverCard";
 
 const PERIODS = [
@@ -93,7 +94,10 @@ export default function MoversTabView({ dayGainers, dayLosers }: Props) {
             onClick={() => setDropdownOpen((v) => !v)}
             className="flex items-center gap-2 bg-gray-800 border border-gray-700 hover:border-gray-500 rounded-xl px-3.5 py-2.5 text-sm font-medium text-gray-200 transition-colors select-none"
           >
-            <span>📅 תקופה: {currentPeriodLabel}</span>
+            <span className="flex items-center gap-1.5">
+              <Calendar size={14} strokeWidth={1.75} />
+              תקופה: {currentPeriodLabel}
+            </span>
             <span
               className={`text-gray-400 text-[10px] transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
             >
@@ -130,7 +134,7 @@ export default function MoversTabView({ dayGainers, dayLosers }: Props) {
                 : "bg-[#1f2937] text-emerald-400"
             }`}
           >
-            עולות 🟢
+            עולות
           </button>
           <button
             onClick={() => setTab("losers")}
@@ -140,7 +144,7 @@ export default function MoversTabView({ dayGainers, dayLosers }: Props) {
                 : "bg-[#1f2937] text-red-400"
             }`}
           >
-            יורדות 🔴
+            יורדות
           </button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Share2 } from "lucide-react";
+import { Share2, Target } from "lucide-react";
 import { AnalysisResult } from "@/lib/types";
 import ConfidenceBadge from "./ConfidenceBadge";
 import ShareTemplate from "./ShareTemplate";
@@ -96,7 +96,10 @@ export default function HeroAnalysisCard({
 
         {/* Headline */}
         <div>
-          <p className="text-xs text-slate-400 mb-3 pr-10">🎯 השורה התחתונה</p>
+          <p className="flex items-center gap-1.5 text-xs text-slate-400 mb-3 pr-10">
+            <Target size={13} strokeWidth={1.75} />
+            השורה התחתונה
+          </p>
           <p className="text-2xl sm:text-3xl font-bold text-white leading-snug mb-4">
             {analysis.oneLiner || analysis.mainReason}
           </p>
