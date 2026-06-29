@@ -61,3 +61,10 @@ export interface StockPageData {
   news: NewsItem[];
   analysis: AnalysisResult;
 }
+
+export interface CompanyProfile {
+  whatTheyDo: string;
+  sector_he: string;
+  industry_he: string;
+  uniqueValue: string;
+}

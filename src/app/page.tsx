@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Zap, Search } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import MiniMarketMovers from "@/components/MiniMarketMovers";
 import StockCard from "@/components/StockCard";
+import CompanyProfileSection from "@/components/CompanyProfileSection";
 import HeroAnalysisCard from "@/components/HeroAnalysisCard";
 import FollowUpChat from "@/components/FollowUpChat";
 import PriceChart from "@/components/PriceChart";
@@ -119,12 +121,13 @@ export default function HomePage() {
             {showHome && (
               <div className="flex justify-center mb-1">
                 <span className="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200/60 text-slate-600 px-3 py-1 rounded-full text-xs font-medium mb-3 shadow-sm">
-                  ⚡ ניתוח AI בזמן אמת
+                  <Zap size={12} strokeWidth={2} />
+                  ניתוח AI בזמן אמת
                 </span>
               </div>
             )}
             <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-gray-900">
-              למה המניה זזה?
+              ניתוח שוק ומניות בזמן אמת
             </h1>
             {showHome && (
               <p className="text-gray-500 text-base sm:text-lg">
@@ -162,13 +165,20 @@ export default function HomePage() {
           <div className="space-y-3">
             <StockCard stock={stockData} />
 
+            <CompanyProfileSection
+              key={stockData.symbol}
+              symbol={stockData.symbol}
+              companyName={stockData.companyName}
+            />
+
             {/* Analyze button — only show before analysis is done */}
             {!result && !loadingAnalysis && (
               <button
                 onClick={handleAnalyze}
-                className="w-full py-3.5 rounded-2xl bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-50 active:bg-blue-100 font-semibold text-base transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-50 active:bg-blue-100 font-semibold text-base transition-colors"
               >
-                נתח מניה 🔍
+                <Search size={17} strokeWidth={2} />
+                נתח מניה
               </button>
             )}
 
