@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useState, useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import type { TrendingItem } from "@/app/api/trending/route";
 
 interface Props {
@@ -21,6 +22,14 @@ function SkeletonRows() {
 export default function MiniMarketMovers({ onSearch }: Props) {
   const [items, setItems] = useState<TrendingItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  function handleMoversClick() {
+    startTransition(() => {
+      router.push("/movers");
+    });
+  }
 
   useEffect(() => {
     fetch("/api/trending")
@@ -72,12 +81,23 @@ export default function MiniMarketMovers({ onSearch }: Props) {
         </div>
       )}
 
-      <Link
-        href="/movers"
-        className="block w-full py-2.5 px-4 rounded-xl border border-gray-700 hover:border-gray-500 text-center text-sm text-gray-400 hover:text-gray-200 transition-colors"
+      <button
+        onClick={handleMoversClick}
+        disabled={isPending}
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-70 text-center text-sm font-semibold text-white transition-colors"
       >
-        ← ראה את כל התנועות הבולטות בשוק
-      </Link>
+        {isPending ? (
+          <>
+            <div className="h-3.5 w-3.5 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
+            טוען...
+          </>
+        ) : (
+          <>
+            <ArrowLeft size={15} strokeWidth={2} />
+            ראה את כל התנועות הבולטות בשוק
+          </>
+        )}
+      </button>
     </div>
   );
 }
