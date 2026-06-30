@@ -49,15 +49,15 @@ export default async function StockPage({ params }: PageProps) {
   if (!data) notFound();
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gray-50 text-gray-900">
+    <div dir="rtl" className="min-h-screen text-gray-100">
       <div className="max-w-2xl mx-auto px-4 py-10 sm:py-16 space-y-5">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
             למה המניה זזה?
           </h1>
           <Link
             href="/"
-            className="text-sm text-blue-600 hover:text-blue-500 font-medium transition-colors"
+            className="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors"
           >
             &larr; חיפוש מניה אחרת
           </Link>
@@ -74,7 +74,7 @@ export default async function StockPage({ params }: PageProps) {
         />
 
         <section className="space-y-3">
-          <h2 className="text-base font-semibold text-gray-500 uppercase tracking-wide">
+          <h2 className="text-base font-semibold text-gray-400 uppercase tracking-wide">
             חדשות אחרונות
           </h2>
           <NewsSection news={data.analysis.enrichedNews} />

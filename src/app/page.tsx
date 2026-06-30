@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Zap, Search } from "lucide-react";
+import Link from "next/link";
+import { Zap, Search, Compass, ChevronLeft } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import MiniMarketMovers from "@/components/MiniMarketMovers";
 import StockCard from "@/components/StockCard";
@@ -112,7 +113,7 @@ export default function HomePage() {
   const showHome = !stockData && !loadingStock;
 
   return (
-    <div dir="rtl" className="flex-1 flex flex-col justify-center bg-gray-50 text-gray-900">
+    <div dir="rtl" className="flex-1 flex flex-col justify-center text-gray-100">
       <div className="max-w-2xl mx-auto w-full px-4 py-6 space-y-6">
 
         {/* ── Hero / Search ── */}
@@ -120,17 +121,17 @@ export default function HomePage() {
           <div className="text-center space-y-1">
             {showHome && (
               <div className="flex justify-center mb-1">
-                <span className="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200/60 text-slate-600 px-3 py-1 rounded-full text-xs font-medium mb-3 shadow-sm">
+                <span className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 text-slate-300 px-3 py-1 rounded-full text-xs font-medium mb-3">
                   <Zap size={12} strokeWidth={2} />
                   ניתוח AI בזמן אמת
                 </span>
               </div>
             )}
-            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-gray-900">
+            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
               ניתוח שוק ומניות בזמן אמת
             </h1>
             {showHome && (
-              <p className="text-gray-500 text-base sm:text-lg">
+              <p className="text-gray-400 text-base sm:text-lg">
                 הכנס סימול מניה וקבל ניתוח AI של התנועה
               </p>
             )}
@@ -140,12 +141,28 @@ export default function HomePage() {
 
           <SearchBar onSearch={handleSearch} loading={loadingStock || loadingAnalysis} />
 
+          {showHome && (
+            <Link
+              href="/discover"
+              className="flex items-center gap-2.5 bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 rounded-2xl px-4 py-2.5 transition-colors"
+            >
+              <div className="shrink-0 h-8 w-8 rounded-xl bg-blue-600/15 flex items-center justify-center">
+                <Compass size={16} strokeWidth={2} className="text-blue-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-white leading-tight">גלה לפי סקטור</p>
+                <p className="text-xs text-gray-500 leading-tight mt-0.5">עיון בכל מניות ה-S&P 500 מחולקות לפי תחום</p>
+              </div>
+              <ChevronLeft size={16} strokeWidth={2} className="text-gray-500 shrink-0" />
+            </Link>
+          )}
+
           {showHome && <MiniMarketMovers onSearch={handleSearch} />}
         </div>
 
         {/* ── Error ── */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-4 text-sm font-medium">
+          <div className="bg-red-950/40 border border-red-800/40 text-red-300 rounded-2xl px-5 py-4 text-sm font-medium">
             {error}
           </div>
         )}
@@ -153,7 +170,7 @@ export default function HomePage() {
         {/* ── Step 1 loading ── */}
         {loadingStock && (
           <div className="space-y-5">
-            <p className="text-center text-gray-500 text-base font-medium animate-pulse">
+            <p className="text-center text-gray-400 text-base font-medium animate-pulse">
               מושך נתוני מניה...
             </p>
             <LoadingSkeleton />
@@ -175,7 +192,7 @@ export default function HomePage() {
             {!result && !loadingAnalysis && (
               <button
                 onClick={handleAnalyze}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-50 active:bg-blue-100 font-semibold text-base transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-transparent border-2 border-blue-600 text-blue-400 hover:bg-blue-950/40 active:bg-blue-900/40 font-semibold text-base transition-colors"
               >
                 <Search size={17} strokeWidth={2} />
                 נתח מניה
@@ -185,7 +202,7 @@ export default function HomePage() {
             {/* ── Step 2 loading ── */}
             {loadingAnalysis && (
               <div className="space-y-4 py-2">
-                <p className="text-center text-gray-500 text-base font-medium animate-pulse">
+                <p className="text-center text-gray-400 text-base font-medium animate-pulse">
                   {loadingMsg}
                 </p>
                 <LoadingSkeleton />

@@ -33,9 +33,9 @@ export default function MarketPulse() {
             )}
             <span
               key={item.name}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-gray-100 text-xs"
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-white/5 border border-white/10 text-xs"
             >
-              <span className="text-gray-500">{item.name}</span>
+              <span className="text-gray-400">{item.name}</span>
               <span className={`font-semibold tabular-nums ${color}`}>
                 {sign}{item.changePercent.toFixed(1)}%
               </span>
