@@ -56,6 +56,11 @@ export async function ensureIndexes(): Promise<void> {
       { createdAt: 1 },
       { expireAfterSeconds: 604800 } // 7 days — company profiles rarely change
     ),
+    db.collection("sectorAnalysisCache").createIndex({ sectorId: 1 }, { unique: true }),
+    db.collection("sectorAnalysisCache").createIndex(
+      { createdAt: 1 },
+      { expireAfterSeconds: 7200 } // 2 hours — sector-level state moves slower than a single stock
+    ),
   ]);
   indexesEnsured = true;
 }
