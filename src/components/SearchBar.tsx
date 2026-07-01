@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, FormEvent, KeyboardEvent } from "react";
+import { Sparkles, Search } from "lucide-react";
 import { topStocks, StockEntry } from "@/lib/topStocks";
 
 const HISTORY_KEY = "searchHistory";
@@ -9,6 +10,7 @@ const HISTORY_MAX = 6;
 interface Props {
   onSearch: (symbol: string) => void;
   loading: boolean;
+  onInputFocus?: () => void; // called when user focuses input — lets parent clear results
 }
 
 // ── localStorage helpers ──────────────────────────────────────────────────────
@@ -42,7 +44,7 @@ function getSuggestions(query: string): StockEntry[] {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function SearchBar({ onSearch, loading }: Props) {
+export default function SearchBar({ onSearch, loading, onInputFocus }: Props) {
   const [symbol, setSymbol] = useState("");
   const [suggestions, setSuggestions] = useState<StockEntry[]>([]);
   const [activeIdx, setActiveIdx] = useState(-1);
@@ -99,6 +101,7 @@ export default function SearchBar({ onSearch, loading }: Props) {
 
   function handleFocus() {
     setFocused(true);
+    onInputFocus?.(); // signal parent to clear previous results
     // If input already has text, re-open autocomplete
     if (symbol.trim()) {
       const results = getSuggestions(symbol);
@@ -144,6 +147,8 @@ export default function SearchBar({ onSearch, loading }: Props) {
 
   const showSuggestions = open && suggestions.length > 0;
   const showHistory = focused && !symbol.trim() && history.length > 0 && !showSuggestions;
+  // Show a "type any symbol" hint when user typed something but got no matches
+  const showNoMatchHint = focused && symbol.trim().length >= 2 && !showSuggestions;
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -151,22 +156,28 @@ export default function SearchBar({ onSearch, loading }: Props) {
     <div ref={containerRef} className="w-full max-w-xl mx-auto">
       <form onSubmit={handleSubmit} dir="rtl" className="w-full flex flex-col gap-3">
         <div className="relative">
+          {/* Search icon — right side (RTL) */}
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Search size={16} strokeWidth={1.75} className="text-gray-500" />
+          </div>
           <input
             type="text"
             value={symbol}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={handleFocus}
+            onFocus={(e) => { handleFocus(); e.currentTarget.style.borderColor = "#3B82F6"; e.currentTarget.style.boxShadow = "0 0 0 2px rgba(59,130,246,0.2)"; }}
+            onBlur={(e)  => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.boxShadow = "none"; }}
             disabled={loading}
             placeholder="הכנס סימול מניה (לדוגמה: TSLA)"
             autoComplete="off"
             spellCheck={false}
-            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#1F2937] border border-white/[0.12] rounded-[14px] pr-10 pl-5 py-4 text-white placeholder-[#6B7280] text-base focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            style={{ boxShadow: "none" }}
           />
 
           {/* Autocomplete suggestions */}
           {showSuggestions && (
-            <ul className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-2xl">
+            <ul className="absolute z-50 w-full mt-1 bg-[#111827] border border-[#1F2937] rounded-2xl overflow-hidden shadow-2xl">
               {suggestions.map((stock, idx) => (
                 <li
                   key={stock.symbol}
@@ -177,9 +188,9 @@ export default function SearchBar({ onSearch, loading }: Props) {
                   onMouseEnter={() => setActiveIdx(idx)}
                   className={`flex items-center justify-between px-4 py-2.5 cursor-pointer select-none transition-colors ${
                     idx === activeIdx
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-100 hover:bg-gray-700"
-                  } ${idx < suggestions.length - 1 ? "border-b border-gray-700" : ""}`}
+                      ? "bg-blue-600/80 text-white"
+                      : "text-gray-100 hover:bg-white/[0.04]"
+                  } ${idx < suggestions.length - 1 ? "border-b border-white/[0.06]" : ""}`}
                 >
                   <span className="font-bold text-sm tracking-widest shrink-0">
                     {stock.symbol}
@@ -198,15 +209,26 @@ export default function SearchBar({ onSearch, loading }: Props) {
 
           {/* Recent searches */}
           {showHistory && (
-            <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-medium mb-2.5 select-none">
-                חיפושים אחרונים
-              </p>
+            <div className="absolute z-50 w-full mt-1 bg-[#111827] border border-[#1F2937] rounded-2xl shadow-2xl px-4 py-3">
+              <div className="flex items-center justify-between mb-2.5">
+                <p className="text-xs text-gray-500 font-medium select-none">חיפושים אחרונים</p>
+                <button
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    writeHistory([]);
+                    setHistory([]);
+                    setFocused(false);
+                  }}
+                  className="text-xs text-gray-500 hover:text-gray-300 transition-colors select-none"
+                >
+                  נקה הכל
+                </button>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {history.map((sym) => (
                   <div
                     key={sym}
-                    className="flex items-center bg-gray-700 hover:bg-gray-600 rounded-lg overflow-hidden transition-colors"
+                    className="flex items-center bg-white/[0.06] hover:bg-white/10 rounded-lg overflow-hidden transition-colors"
                   >
                     <span
                       onMouseDown={(e) => {
@@ -230,12 +252,31 @@ export default function SearchBar({ onSearch, loading }: Props) {
               </div>
             </div>
           )}
+
+          {/* Hint when symbol not in autocomplete list */}
+          {showNoMatchHint && (
+            <div className="absolute z-50 w-full mt-1 bg-[#111827] border border-[#1F2937] rounded-2xl shadow-2xl px-4 py-3">
+              <p className="text-xs text-gray-500 text-center">
+                לחץ &quot;חפש מניה&quot; לחיפוש ישיר — הסימול לא בפתרון האוטומטי אבל עשוי לקיים
+              </p>
+            </div>
+          )}
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+          className="w-full disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all duration-150"
+          style={{
+            background: loading ? "#2563EB" : "linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)",
+            boxShadow: loading ? "none" : "0 0 20px rgba(37,99,235,0.45), 0 4px 16px rgba(37,99,235,0.25)",
+          }}
+          onMouseEnter={(e) => {
+            if (!loading) (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 32px rgba(59,130,246,0.6), 0 4px 20px rgba(37,99,235,0.35)";
+          }}
+          onMouseLeave={(e) => {
+            if (!loading) (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 20px rgba(37,99,235,0.45), 0 4px 16px rgba(37,99,235,0.25)";
+          }}
         >
           {loading ? (
             <>
@@ -245,24 +286,16 @@ export default function SearchBar({ onSearch, loading }: Props) {
                 fill="none"
                 viewBox="0 0 24 24"
               >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"
-                />
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
               </svg>
               טוען...
             </>
           ) : (
-            "חפש מניה"
+            <>
+              <Sparkles size={18} strokeWidth={1.75} />
+              חפש מניה
+            </>
           )}
         </button>
       </form>

@@ -5,13 +5,16 @@ import { useState } from "react";
 interface Props {
   symbol: string;
   domain?: string;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
 }
 
 export default function CompanyLogo({ symbol, domain, size = "md" }: Props) {
   const [failed, setFailed] = useState(false);
 
-  const dim = size === "sm" ? "w-6 h-6 text-xs" : "w-8 h-8 text-sm";
+  const dim =
+    size === "sm" ? "w-6 h-6 text-xs" :
+    size === "lg" ? "w-14 h-14 text-xl" :
+    "w-8 h-8 text-sm";
 
   if (!domain || failed) {
     return (

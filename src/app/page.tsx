@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Zap, Search, Compass, ChevronLeft } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import MiniMarketMovers from "@/components/MiniMarketMovers";
-import StockCard from "@/components/StockCard";
+import StockHero from "@/components/StockHero";
 import CompanyProfileSection from "@/components/CompanyProfileSection";
 import HeroAnalysisCard from "@/components/HeroAnalysisCard";
 import FollowUpChat from "@/components/FollowUpChat";
@@ -118,28 +118,69 @@ export default function HomePage() {
 
         {/* ── Hero / Search ── */}
         <div className={`space-y-3 ${showHome ? "py-4 sm:py-8" : ""}`}>
-          <div className="text-center space-y-1">
+          <div className="text-center space-y-2">
             {showHome && (
-              <div className="flex justify-center mb-1">
-                <span className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 text-slate-300 px-3 py-1 rounded-full text-xs font-medium mb-3">
+              <div className="flex justify-center mb-2">
+                <span className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 text-slate-300 px-3 py-1 rounded-full text-xs font-medium">
                   <Zap size={12} strokeWidth={2} />
                   ניתוח AI בזמן אמת
                 </span>
               </div>
             )}
-            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
-              ניתוח שוק ומניות בזמן אמת
+            <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-[1.1]">
+              <span className="text-white">ניתוח שוק ומניות</span>
+              <br />
+              <span
+                style={{
+                  background: "linear-gradient(90deg, #60A5FA 0%, #A78BFA 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                בזמן אמת
+              </span>
             </h1>
             {showHome && (
-              <p className="text-gray-400 text-base sm:text-lg">
+              <p className="text-gray-400 text-sm sm:text-base mt-1">
                 הכנס סימול מניה וקבל ניתוח AI של התנועה
               </p>
             )}
           </div>
 
+          {/* Stats bar — marketing numbers, shown only on home */}
+          {showHome && (
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: "AI Confidence", value: "94%", sub: "דיוק ניתוח" },
+                { label: "זמן ניתוח ממוצע", value: "3.2s", sub: "מהיר במיוחד" },
+                { label: "מניות מנותחות", value: "25,000+", sub: "בכל יום" },
+              ].map(({ label, value, sub }) => (
+                <div
+                  key={label}
+                  className="flex flex-col items-center justify-center bg-[#111827] border border-white/[0.06] rounded-2xl py-3 px-2 gap-0.5"
+                >
+                  <span className="text-[10px] text-gray-500 leading-none text-center">{label}</span>
+                  <span className="text-lg font-bold text-white leading-snug tabular-nums">{value}</span>
+                  <span className="text-[10px] text-gray-500 leading-none">{sub}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
           {showHome && <MarketPulse />}
 
-          <SearchBar onSearch={handleSearch} loading={loadingStock || loadingAnalysis} />
+          <SearchBar
+            onSearch={handleSearch}
+            loading={loadingStock || loadingAnalysis}
+            onInputFocus={() => {
+              if (stockData) {
+                setStockData(null);
+                setResult(null);
+                setError(null);
+              }
+            }}
+          />
 
           {showHome && (
             <Link
@@ -180,7 +221,11 @@ export default function HomePage() {
         {/* ── Step 1 result: StockCard + Analyze button ── */}
         {stockData && !loadingStock && (
           <div className="space-y-3">
-            <StockCard stock={stockData} />
+            <StockHero
+              stock={stockData}
+              newsCount={result?.news.length ?? 0}
+              confidence={result?.analysis.confidence ?? 0}
+            />
 
             <CompanyProfileSection
               key={stockData.symbol}

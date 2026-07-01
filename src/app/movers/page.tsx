@@ -5,6 +5,8 @@ import { TrendingUp } from "lucide-react";
 import YahooFinance from "yahoo-finance2";
 import MoversTabView from "@/components/MoversTabView";
 import { type MoverData } from "@/components/MoverCard";
+import { calculateAIScore } from "@/lib/calculateAIScore";
+import type { StockData } from "@/lib/types";
 
 export const revalidate = 600;
 
@@ -12,12 +14,22 @@ const yf = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function quoteToMover(quote: any): MoverData {
+  const stockLike = {
+    changePercent: quote.regularMarketChangePercent ?? 0,
+    volume: quote.regularMarketVolume ?? 0,
+    avgVolume: quote.averageDailyVolume3Month ?? 0,
+    peRatio: quote.trailingPE ?? undefined,
+    beta: quote.beta ?? undefined,
+    dividendYield: quote.dividendYield ?? undefined,
+  } as Partial<StockData>;
+
   return {
     symbol: quote.symbol,
     name: quote.shortName ?? quote.longName ?? quote.symbol,
     price: quote.regularMarketPrice ?? 0,
     changePercent: quote.regularMarketChangePercent ?? 0,
     mainReason: "",
+    aiScore: calculateAIScore(stockLike as StockData, 0, 0),
   };
 }
 
@@ -34,22 +46,24 @@ export default async function MoversPage() {
 
   return (
     <div dir="rtl" className="min-h-screen text-gray-100">
-      <div className="max-w-2xl mx-auto px-4 py-10 sm:py-16">
-        <div className="flex items-start justify-between mb-8 gap-4">
+      <div className="max-w-2xl mx-auto px-4 pt-6 pb-24">
+
+        {/* Hero */}
+        <div className="flex items-start justify-between mb-6 gap-4">
           <div>
-            <h1 className="flex items-center gap-2 text-3xl sm:text-4xl font-bold tracking-tight text-white">
-              <TrendingUp size={28} strokeWidth={2} />
-              Market Movers
+            <h1 className="flex items-center gap-2.5 text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+              התנועות
+              <TrendingUp size={26} strokeWidth={2.5} className="text-blue-400 shrink-0" />
             </h1>
-            <p className="text-gray-400 text-sm mt-1">
-              המניות עם השינוי החד ביותר לפי תקופה
+            <p className="text-gray-400 text-sm mt-1.5 leading-snug">
+              מעקב אחר המניות בתנועה הגרוה ביותר בשוק
             </p>
           </div>
           <Link
             href="/"
             className="shrink-0 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors mt-1"
           >
-            ← חזור לחיפוש
+            ← חזור
           </Link>
         </div>
 

@@ -19,6 +19,8 @@ export interface StockData {
   debtToEquity?: number;
   shortFloat?: number;
   website?: string;
+  aiScore?: number;
+  exchange?: string;
 }
 
 export interface NewsItem {

@@ -2,6 +2,7 @@
 import YahooFinance from "yahoo-finance2";
 import { StockData } from "./types";
 import { getDomainFromCompanyName, normalizeDomain } from "./getDomain";
+import { calculateAIScore } from "./calculateAIScore";
 
 const yf = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 
@@ -26,7 +27,7 @@ export default async function fetchStockData(symbol: string): Promise<StockData>
       ? normalizeDomain(rawWebsite)
       : getDomainFromCompanyName(quote.shortName ?? symbol);
 
-    return {
+    const stock: StockData = {
       symbol: quote.symbol,
       companyName: quote.shortName ?? symbol,
       price: quote.regularMarketPrice,
@@ -49,7 +50,11 @@ export default async function fetchStockData(symbol: string): Promise<StockData>
       debtToEquity: fin?.debtToEquity ?? undefined,
       shortFloat: (quote as Record<string, unknown>).shortPercentOfFloat as number | undefined,
       website,
+      exchange: (quote.fullExchangeName ?? quote.exchange) as string | undefined,
     };
+
+    stock.aiScore = calculateAIScore(stock, 0, 0);
+    return stock;
   } catch (err) {
     if (err instanceof Error) {
       if (err.message === "Symbol not found") throw err;

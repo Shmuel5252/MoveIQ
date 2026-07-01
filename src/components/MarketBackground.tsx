@@ -82,7 +82,7 @@ export default function MarketBackground() {
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 -z-10 overflow-hidden bg-[#0a0e17] pointer-events-none"
+      className="fixed inset-0 -z-10 overflow-hidden bg-[#090C12] pointer-events-none"
     >
       {/* Radial gradient blob — top-right, blue/purple, fading to dark */}
       <div

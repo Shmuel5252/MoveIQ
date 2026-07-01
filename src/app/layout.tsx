@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MarketBackground from "@/components/MarketBackground";
+import BottomNav from "@/components/BottomNav";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,8 +35,9 @@ export default function RootLayout({
         <MarketBackground />
         <div className="relative z-10 flex flex-col min-h-screen">
           <Header />
-          <main className="flex-1 flex flex-col">{children}</main>
+          <main className="flex-1 flex flex-col pb-16">{children}</main>
           <Footer />
+          <BottomNav />
         </div>
       </body>
     </html>
